@@ -11,7 +11,7 @@ def create_user
     $current_user = CurrentUser.make_user(input)
     if $current_user == nil
         puts 'Invalid input, please enter a name without only spaces.'
-        sleep(2)
+        sleep(1)
         create_user
     end
     user_menu($current_user)
@@ -105,7 +105,11 @@ def log_in
                     if playlist_select == 'Back'
                         user_menu(current_user)
                     else
-                        CurrentUser.delete_playlist(current_user.name, playlist_select)
+                        answer = CurrentUser.delete_playlist(current_user.name, playlist_select)
+                        if answer == nil
+                            puts "Sorry, you can't delete your only playlist. Where would you save songs?!"
+                            sleep(1)
+                        end
                         user_menu(current_user)
                     end           
                 when 'Search For Songs'

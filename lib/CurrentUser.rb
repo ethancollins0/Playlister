@@ -38,9 +38,14 @@ class CurrentUser
     end
 
     def self.delete_playlist username, playlistName #deletes playlist and songs
-        playlistId = CurrentUser.get_playlist_id(username, playlistName)
-        CurrentUser.delete_playlist_songs(username, playlistName)
-        Playlist.where(id: playlistId).destroy_all
+        user = User.where(name: username).first
+        if user.playlists.count == 1
+            return nil
+        else
+            playlistId = CurrentUser.get_playlist_id(username, playlistName)
+            CurrentUser.delete_playlist_songs(username, playlistName)
+            Playlist.where(id: playlistId).destroy_all
+        end
     end
 
     def self.delete_playlist_songs username, playlistName #deletes all songs from a playlist (but leaves playlist)
@@ -57,13 +62,9 @@ class CurrentUser
         end
     end
 
-    def self.get_song_ids songArray
-        songArray.map {|song| Song.where(title: song).first.track_id}
-    end
-
     def self.delete_user username
-        playlistArray = []
-        playlists = User.where(name: username).first.playlists
+        user = User.where(name: username).first
+        playlistsArray = user.playlists.map {|playlist| playlist.name}
         binding.pry
         playlistArray.each do |playlist|
             CurrentUser.delete_playlist(username, playlist)
