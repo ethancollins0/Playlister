@@ -4,10 +4,12 @@ require 'pry'
 
 class CurrentUser
     def self.make_user name
-        if User.where(name: name).count == 0
+        if (name.strip.length > 0)
             user = User.create(name: name)
-            CurrentUser.create_playlist(name, 'Default Playlist')
-            user
+            CurrentUser.create_playlist(name, 'Default Playlist')  
+            user  
+        else
+            return nil
         end
     end
 

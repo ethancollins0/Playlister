@@ -9,16 +9,28 @@ def create_user
     puts "Enter your User Name."
     input = gets.chomp
     $current_user = CurrentUser.make_user(input)
+    if $current_user == nil
+        puts 'Invalid input, please enter a name without only spaces.'
+        sleep(2)
+        create_user
+    end
     user_menu($current_user)
 end
 
 def log_in
     system "clear"
     Screen.title
+  
+    if User.all.count == 0 
+        puts "No users found, please create new user."
+        sleep(2)
+        create_user
+    end
+  
     prompt = TTY::Prompt.new
-        puts "Select a user to log into"
+        # puts "Select a user to log into"
         choices = User.all.map{|user| user.name}
-        select_user = prompt.select("Select a user to log in", choices)
+        select_user = prompt.select("Select a user to log into", choices)
         $current_user = User.find_by(name: select_user)
         user_menu($current_user)
     end
