@@ -8,6 +8,7 @@ class CreateSongs < ActiveRecord::Migration[5.2]
       t.string :year
       t.string :track_id
       t.string :track_url
+      t.string :track_sample_url
     end
   end
 end
