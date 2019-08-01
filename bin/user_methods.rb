@@ -80,12 +80,38 @@ def log_in
         end
     end
 
+    def get_recommendations (current_user)
+        prompt = TTY::Prompt.new
+        user = User.where(name: current_user.name).first
+        users_playlists = user.playlists.map{|playlist| playlist.name}
+        current_playlists = user.playlists
+        selected = prompt.select("Select a playlist", current_playlists.map{|playlist| playlist.name}, 'Back')
+        if selected == 'Back'
+            user_menu(current_user)
+        else
+            system "clear"
+            Screen.title
+            puts "Viewing Playlist #{selected}"
+            playlist_songs = Playlist.where(name: selected).where(user_id: current_user.id).first.songs
+            choices = playlist_songs.map{|song| "#{song.title} - #{song.artist} - #{song.album}"}
+            selected_songs = prompt.multi_select("Choose up to five songs to get recommendations", choices)
+            song_names = selected_songs.map{|song| song.split(" - ").first.strip}
+            song_ids = CurrentUser.get_song_ids(song_names).join("%2C")
+            rest_client = RestClient.get("https://api.spotify.com/v1/recommendations?seed_tracks=#{song_ids}",
+                            'Authorization' => "Bearer #{GetData.access_token}")
+            rec_tracks_response = JSON.parse(rest_client)
+            rec_tracks_parse = rec_tracks_response['tracks']
+            Search.tracks_select(rec_tracks_parse, users_playlists)
+            user_menu($current_user)
+        end
+    end
+
     def user_menu (current_user)
         system "clear"
         Screen.title
         prompt = TTY::Prompt.new
         puts "Welcome, #{current_user.name}"
-        choices = ["View Playlists", "Create Playlist", "Delete Playlist", "Search For Songs", "Log-out"]
+        choices = ["View Playlists", "Create Playlist", "Delete Playlist", "Search For Songs", "Get Recommendations", "Log-out"]
         user_menu_select = prompt.select("What would you like to do?", choices)
       
         loop do
@@ -110,11 +136,13 @@ def log_in
                     end           
                 when 'Search For Songs'
                     Search.search_menu
+                when 'Get Recommendations'
+                    get_recommendations($current_user)
                 when 'Log-out'
                     welcome
             end
         end
     end
-
+# binding.pry
     
     welcome
