@@ -35,12 +35,10 @@ class Search
             end
         else
             track_parse.each do |item|
-                binding.pry
                 tracks_hash = {title: item['name'], artist: item['artists'][0]['name'], album: album_name.split(' - ').first, year: album_year, track_id: item['id'], track_url: item['external_urls']['spotify'], track_sample_url: item['preview_url']}
                 display_tracks << tracks_hash
             end
         end
-        binding.pry
         loop do
             system("clear")
             Screen.title        
@@ -54,7 +52,6 @@ class Search
         puts selected_song
         song_index = choices.index{|song| song == selected_song}
         yes_or_no = prompt.select("Save this song to a playlist?", %w[Yes No])
-        # binding.pry
         if yes_or_no == 'Yes'
             selected_playlist = prompt.select("Select a playlist to add this song to", users_playlists)
             current_song = display_tracks[song_index]
@@ -77,7 +74,6 @@ class Search
             'Authorization' => "Bearer #{GetData.access_token}")
         track_response = JSON.parse(rest_client)
         if track_response['tracks']['items'].count > 0
-        # binding.pry
             track_parse = track_response['tracks']['items']
             Search.tracks_select(track_parse, users_playlists)
         else

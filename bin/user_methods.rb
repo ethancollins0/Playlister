@@ -49,17 +49,12 @@ def log_in
         end
     end
 
-    def select_playlist_songs(current_playlists, current_user)
+    def select_playlist_songs(current_playlists, playlist_songs, current_user = nil, selected_playlist = nil)
         prompt = TTY::Prompt.new
-        selected = prompt.select("Select a playlist", current_playlists.map{|playlist| playlist.name}, 'Back')
-            if selected == 'Back'
-                user_menu(current_user)
-            else
-                system "clear"
-                Screen.title
-                puts "Viewing Playlist #{selected}"
-                playlist_songs = Playlist.where(name: selected).where(user_id: current_user.id).first.songs
-                choices = playlist_songs.map{|song| "#{song.title} - #{song.artist} - #{song.album}"}
+        ##############
+        choices = playlist_songs.map do |song|
+                     "#{song.title} - #{song.artist} - #{song.album}"
+                end
                 selected_song = prompt.select("Choose a Song", choices, 'Back')
                 if selected_song == 'Back'
                     view_playlists(current_user)
@@ -69,6 +64,7 @@ def log_in
                     song_url = Song.where(title: song_name).first.track_url
                     song_sample_url = Song.where(title: song_name).first.track_sample_url
                     select = prompt.select("What do you want to do?", 'Play Song', 'Sample Song', 'Delete Song', 'Back')
+                    loop do
                     case select
                         when 'Play Song'
                             system("open", song_url)
@@ -82,7 +78,7 @@ def log_in
                         when 'Delete Song'
                             yes_or_no = prompt.yes?("Delete Song?")
                             if yes_or_no == true
-                                CurrentUser.delete_specific_song(current_user.name, selected, song_name)
+                                CurrentUser.delete_specific_song(current_user.name, selected_playlist, song_name)
                             else
                                 view_playlists(current_user)
                             end
@@ -92,19 +88,43 @@ def log_in
                 
                 end
             end
-    end
+    
 
     def view_playlists (current_user)
         system "clear"
         Screen.title
         prompt = TTY::Prompt.new
-        playlist_select = prompt.select("Would you like to see your playlists or other user's playlists?", 'My Playlists', 'Other Playlists')
+        playlist_select = prompt.select("Would you like to see your playlists or other user's playlists?", 'My Playlists', 'All Playlists')
         user = User.where(name: current_user.name).first
         if playlist_select == 'My Playlists'
             current_playlists = user.playlists
-            select_playlist_songs(current_playlists, current_user)
+            selected = prompt.select("Select a playlist", current_playlists.map{|playlist| playlist.name}, 'Back')
+            if selected == 'Back'
+                user_menu(current_user)
+            else
+                selected_playlist = selected
+                system "clear"
+                Screen.title
+                puts "Viewing Playlist #{selected}"
+                playlist_songs = Playlist.where(name: selected).where(user_id: current_user.id).first.songs
+                select_playlist_songs(current_playlists, playlist_songs, current_user, selected_playlist)
+            end
         else
-            current_playlists = nil #all users public playlists
+            current_playlists = Playlist.where(public: true)
+            selected = prompt.select("Select a playlist", current_playlists.map{|playlist| playlist.name}, 'Back')
+            if selected == 'Back'
+                user_menu(current_user)
+            else
+                system "clear"
+                Screen.title
+                puts "Viewing Playlist #{selected}"
+                filtered_songs = [] 
+                playlist_songs = Playlist.all.select do |playlist| 
+                    filtered_songs << playlist.songs unless playlist.songs == [] || playlist.public == false
+                end
+                selected_playlist = selected
+                select_playlist_songs(current_playlists, filtered_songs[0], current_user, selected_playlist)
+            end
         end
     end
 
@@ -163,8 +183,13 @@ def log_in
                     if playlist_select == 'Back'
                         user_menu(current_user)
                     else
-                        CurrentUser.delete_playlist(current_user.name, playlist_select)
-                        user_menu(current_user)
+                        yes_or_no = prompt.yes?("Delete Playlist #{playlist_select}.      Are you sure?")
+                        if yes_or_no == true
+                            CurrentUser.delete_playlist(current_user.name, playlist_select)
+                            user_menu(current_user)
+                        else
+                            user_menu(current_user)
+                        end
                     end           
                 when 'Search For Songs'
                     Search.search_menu
@@ -184,6 +209,5 @@ def log_in
             end
         end
     end
-# binding.pry
     
     welcome
