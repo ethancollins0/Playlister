@@ -29,21 +29,27 @@ class Search
         prompt = TTY::Prompt.new
         display_tracks = []
         if @@is_album == false
-            # binding.pry
             track_parse.each do |item|
-                tracks_hash = {title: item['name'], artist: item['artists'][0]['name'], album: item['album']['name'].split(' - ').first, year: item['album']['release_date'].first(4), track_id: item['id']}
+                tracks_hash = {title: item['name'], artist: item['artists'][0]['name'], album: item['album']['name'].split(' - ').first, year: item['album']['release_date'].first(4), track_id: item['id'], track_url: item['external_urls']['spotify']}
                 display_tracks << tracks_hash
             end
         else
             track_parse.each do |item|
-                tracks_hash = {title: item['name'], artist: item['artists'][0]['name'], album: album_name.split(' - ').first, year: album_year, track_id: item['id']}
+                tracks_hash = {title: item['name'], artist: item['artists'][0]['name'], album: album_name.split(' - ').first, year: album_year, track_id: item['id'], track_url: item['external_urls']['spotify']}
                 display_tracks << tracks_hash
             end
-        end        
+        end
+        binding.pry
+        loop do
+            system("clear")
+            Screen.title        
         choices = display_tracks.map.with_index(1) do |track| 
             "#{track[:title]} - #{track[:artist]} - #{track[:album]}"
         end
-        selected_song = prompt.select("Select a song or perform new search", choices)
+        selected_song = prompt.select("Select a song to save", 'Back', choices)
+        if selected_song == 'Back'
+            user_menu($current_user)
+        else
         puts selected_song
         song_index = choices.index{|song| song == selected_song}
         yes_or_no = prompt.select("Save this song to a playlist?", %w[Yes No])
@@ -54,6 +60,8 @@ class Search
             CurrentUser.save_song(current_song, $current_user.name, selected_playlist)
             puts "Saved Song to Playlist!"
         end
+    end
+    end
     end
 
     def self.search_track(search_type)
