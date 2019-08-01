@@ -7,7 +7,7 @@ class Search
     @@base_url = "https://api.spotify.com/v1"
     def self.search_menu
         system "clear"
-        Screen.main_title
+        Screen.title
         prompt = TTY::Prompt.new
         choices = ["Track", "Artist", "Album", "Back"]
         search_select = prompt.select("What would you like to search for?", choices)
@@ -25,7 +25,7 @@ class Search
     
     def self.tracks_select (track_parse, users_playlists, album_name = nil, album_year = nil)
         system "clear"
-        Screen.main_title
+        Screen.title
         prompt = TTY::Prompt.new
         display_tracks = []
         if @@is_album == false
@@ -57,7 +57,7 @@ class Search
 
     def self.search_track(search_type)
         system "clear"
-        Screen.main_title
+        Screen.title
         prompt = TTY::Prompt.new
         user = User.where(name: $current_user.name).first
         users_playlists = user.playlists.map{|playlist| playlist.name}
@@ -78,7 +78,7 @@ class Search
     
     def self.search_artist(search_type)
         system "clear"
-        Screen.main_title
+        Screen.title
         prompt = TTY::Prompt.new
         user = User.where(name: $current_user.name).first
         users_playlists = user.playlists.map{|playlist| playlist.name}
@@ -125,7 +125,7 @@ class Search
     
     def self.search_album(search_type)
         system "clear"
-        Screen.main_title
+        Screen.title
         prompt = TTY::Prompt.new
         @@is_album = true
         user = User.where(name: $current_user.name).first

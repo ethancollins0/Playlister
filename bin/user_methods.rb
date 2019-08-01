@@ -5,7 +5,7 @@ require 'tty-prompt'
 current_user = nil
 def create_user
     system("clear")
-    Screen.main_title
+    Screen.title
     puts "Enter your User Name."
     input = gets.chomp
     $current_user = CurrentUser.make_user(input)
@@ -14,7 +14,7 @@ end
 
 def log_in
     system "clear"
-    Screen.main_title
+    Screen.title
     prompt = TTY::Prompt.new
         puts "Select a user to log into"
         choices = User.all.map{|user| user.name}
@@ -39,7 +39,7 @@ def log_in
 
     def view_playlists (current_user)
         system "clear"
-        Screen.main_title
+        Screen.title
         prompt = TTY::Prompt.new
         user = User.where(name: current_user.name).first
         current_playlists = user.playlists
@@ -48,7 +48,7 @@ def log_in
             user_menu(current_user)
         else
             system "clear"
-            Screen.main_title
+            Screen.title
             puts "Viewing Playlist #{selected}"
             playlist_songs = Playlist.where(name: selected).where(user_id: current_user.id).first.songs
             choices = playlist_songs.map{|song| "#{song.title} - #{song.artist} - #{song.album}"}
@@ -70,7 +70,7 @@ def log_in
 
     def user_menu (current_user)
         system "clear"
-        Screen.main_title
+        Screen.title
         prompt = TTY::Prompt.new
         puts "Welcome, #{current_user.name}"
         choices = ["View Playlists", "Create Playlist", "Delete Playlist", "Search For Songs", "Log-out"]
