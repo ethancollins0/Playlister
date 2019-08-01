@@ -37,11 +37,6 @@ class CurrentUser
         Playlistsong.create(song_id: song.id, playlist_id: playlistId)
     end
 
-    def self.get_playlist_id(username, playlistName)
-        userId = User.where(name: username).first.id
-        Playlist.where(user_id: userId).where(name: playlistName).first.id
-    end
-
     def self.delete_playlist username, playlistName #deletes playlist and songs
         playlistId = CurrentUser.get_playlist_id(username, playlistName)
         CurrentUser.delete_playlist_songs(username, playlistName)
@@ -62,11 +57,14 @@ class CurrentUser
         end
     end
 
+    def self.get_song_ids songArray
+        songArray.map {|song| Song.where(title: song).first.track_id}
+    end
+
     def self.delete_user username
         playlistArray = []
-        CurrentUser.find_playlists(username).each_with_index do |value, index|
-            playlistArray << CurrentUser.find_playlists(username)[index].name
-        end
+        playlists = User.where(name: username).first.playlists
+        binding.pry
         playlistArray.each do |playlist|
             CurrentUser.delete_playlist(username, playlist)
         end
