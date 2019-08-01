@@ -28,9 +28,8 @@ class CurrentUser
     end
 
     def self.save_song h, username, playlistName # takes in hash, username, playlistName
-        # binding.pry
         if Song.where(title: h[:title]).where(artist: h[:artist]).count == 0
-            song = Song.create(title: h[:title], artist: h[:artist], album: h[:album], genre: h[:genre], year: h[:year], track_id: h[:track_id]) #adds songs, attr values nil by default
+            song = Song.create(title: h[:title], artist: h[:artist], album: h[:album], genre: h[:genre], year: h[:year], track_id: h[:track_id], track_url: h[:track_url]) #adds songs, attr values nil by default
         else
             song = Song.where(title: h[:title]).where(artist: h[:artist]).first
         end
@@ -63,11 +62,10 @@ class CurrentUser
     end
 
     def self.delete_user username
-        playlistArray = []
-        playlists = User.where(name: username).first.playlists
-        binding.pry
+        user = User.where(name: username).first
+        playlistArray = user.playlists
         playlistArray.each do |playlist|
-            CurrentUser.delete_playlist(username, playlist)
+            CurrentUser.delete_playlist(username, playlist.name)
         end
         User.where(name: username).destroy_all
     end

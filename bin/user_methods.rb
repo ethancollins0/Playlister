@@ -69,13 +69,25 @@ def log_in
                 view_playlists(current_user)
             else
                 puts selected_song
-                yes_or_no = prompt.yes?("Delete Song?")
                 song_name = selected_song.split("-").first.strip
-            end
-            if yes_or_no == true
-                CurrentUser.delete_specific_song(current_user.name, selected, song_name)
-            else
-                view_playlists(current_user)
+                song_url = Song.where(title: song_name).first.track_url
+                select = prompt.select("What do you want to do?", 'Play Song', 'Delete Song', 'Back')
+                loop do
+                    case select
+                        when 'Play Song'
+                            system("open", song_url)
+                            view_playlists(current_user)
+                        when 'Delete Song'
+                            yes_or_no = prompt.yes?("Delete Song?")
+                            if yes_or_no == true
+                                CurrentUser.delete_specific_song(current_user.name, selected, song_name)
+                            else
+                                view_playlists(current_user)
+                            end
+                        when 'Back'
+                            view_playlists(current_user)
+                    end
+                end
             end
         end
     end
@@ -111,7 +123,7 @@ def log_in
         Screen.title
         prompt = TTY::Prompt.new
         puts "Welcome, #{current_user.name}"
-        choices = ["View Playlists", "Create Playlist", "Delete Playlist", "Search For Songs", "Get Recommendations", "Log-out"]
+        choices = ["View Playlists", "Create Playlist", "Delete Playlist", "Search For Songs", "Get Recommendations", "Delete User", "Log-out"]
         user_menu_select = prompt.select("What would you like to do?", choices)
       
         loop do
@@ -138,6 +150,15 @@ def log_in
                     Search.search_menu
                 when 'Get Recommendations'
                     get_recommendations($current_user)
+                when 'Delete User'
+                    prompt = TTY::Prompt.new
+                    yes_or_no = prompt.yes?("Delete user #{$current_user.name}.    Are you sure?")
+                    if yes_or_no == true
+                        CurrentUser.delete_user($current_user.name)
+                        welcome
+                    else
+                        user_menu($current_user)
+                    end
                 when 'Log-out'
                     welcome
             end
