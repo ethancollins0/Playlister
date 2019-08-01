@@ -29,13 +29,14 @@ class Search
         prompt = TTY::Prompt.new
         display_tracks = []
         if @@is_album == false
+            # binding.pry
             track_parse.each do |item|
                 tracks_hash = {title: item['name'], artist: item['artists'][0]['name'], album: item['album']['name'].split(' - ').first, year: item['album']['release_date'].first(4), track_id: item['id']}
                 display_tracks << tracks_hash
             end
         else
             track_parse.each do |item|
-                tracks_hash = {title: item['name'], artist: item['artists'][0]['name'], album: album_name.split(' - ').first, year: album_year,track_id: item['id']}
+                tracks_hash = {title: item['name'], artist: item['artists'][0]['name'], album: album_name.split(' - ').first, year: album_year, track_id: item['id']}
                 display_tracks << tracks_hash
             end
         end        
@@ -46,10 +47,10 @@ class Search
         puts selected_song
         song_index = choices.index{|song| song == selected_song}
         yes_or_no = prompt.select("Save this song to a playlist?", %w[Yes No])
+        # binding.pry
         if yes_or_no == 'Yes'
             selected_playlist = prompt.select("Select a playlist to add this song to", users_playlists)
             current_song = display_tracks[song_index]
-            # binding.pry
             CurrentUser.save_song(current_song, $current_user.name, selected_playlist)
             puts "Saved Song to Playlist!"
         end

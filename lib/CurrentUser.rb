@@ -28,6 +28,7 @@ class CurrentUser
     end
 
     def self.save_song h, username, playlistName # takes in hash, username, playlistName
+        # binding.pry
         if Song.where(title: h[:title]).where(artist: h[:artist]).count == 0
             song = Song.create(title: h[:title], artist: h[:artist], album: h[:album], genre: h[:genre], year: h[:year], track_id: h[:track_id]) #adds songs, attr values nil by default
         else
