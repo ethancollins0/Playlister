@@ -49,34 +49,36 @@ def log_in
         end
     end
 
-    def view_playlists (current_user)
-        system "clear"
-        Screen.title
+    def select_playlist_songs(current_playlists, current_user)
         prompt = TTY::Prompt.new
-        user = User.where(name: current_user.name).first
-        current_playlists = user.playlists
         selected = prompt.select("Select a playlist", current_playlists.map{|playlist| playlist.name}, 'Back')
-        if selected == 'Back'
-            user_menu(current_user)
-        else
-            system "clear"
-            Screen.title
-            puts "Viewing Playlist #{selected}"
-            playlist_songs = Playlist.where(name: selected).where(user_id: current_user.id).first.songs
-            choices = playlist_songs.map{|song| "#{song.title} - #{song.artist} - #{song.album}"}
-            selected_song = prompt.select("Choose a Song", choices, 'Back')
-            if selected_song == 'Back'
-                view_playlists(current_user)
+            if selected == 'Back'
+                user_menu(current_user)
             else
-                puts selected_song
-                song_name = selected_song.split("-").first.strip
-                song_url = Song.where(title: song_name).first.track_url
-                select = prompt.select("What do you want to do?", 'Play Song', 'Delete Song', 'Back')
-                loop do
+                system "clear"
+                Screen.title
+                puts "Viewing Playlist #{selected}"
+                playlist_songs = Playlist.where(name: selected).where(user_id: current_user.id).first.songs
+                choices = playlist_songs.map{|song| "#{song.title} - #{song.artist} - #{song.album}"}
+                selected_song = prompt.select("Choose a Song", choices, 'Back')
+                if selected_song == 'Back'
+                    view_playlists(current_user)
+                else
+                    puts selected_song
+                    song_name = selected_song.split("-").first.strip
+                    song_url = Song.where(title: song_name).first.track_url
+                    song_sample_url = Song.where(title: song_name).first.track_sample_url
+                    select = prompt.select("What do you want to do?", 'Play Song', 'Sample Song', 'Delete Song', 'Back')
                     case select
                         when 'Play Song'
                             system("open", song_url)
-                            view_playlists(current_user)
+                        when 'Sample Song'
+                            if song_sample_url == nil
+                                puts "No Sample Available"
+                                sleep(1)
+                            else
+                            system("open", song_sample_url)
+                            end
                         when 'Delete Song'
                             yes_or_no = prompt.yes?("Delete Song?")
                             if yes_or_no == true
@@ -87,8 +89,22 @@ def log_in
                         when 'Back'
                             view_playlists(current_user)
                     end
+                
                 end
             end
+    end
+
+    def view_playlists (current_user)
+        system "clear"
+        Screen.title
+        prompt = TTY::Prompt.new
+        playlist_select = prompt.select("Would you like to see your playlists or other user's playlists?", 'My Playlists', 'Other Playlists')
+        user = User.where(name: current_user.name).first
+        if playlist_select == 'My Playlists'
+            current_playlists = user.playlists
+            select_playlist_songs(current_playlists, current_user)
+        else
+            current_playlists = nil #all users public playlists
         end
     end
 

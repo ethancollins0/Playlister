@@ -33,6 +33,7 @@ ActiveRecord::Schema.define(version: 2019_07_30_221111) do
     t.string "year"
     t.string "track_id"
     t.string "track_url"
+    t.string "track_sample_url"
   end
 
   create_table "users", force: :cascade do |t|

@@ -29,7 +29,7 @@ class CurrentUser
 
     def self.save_song h, username, playlistName # takes in hash, username, playlistName
         if Song.where(title: h[:title]).where(artist: h[:artist]).count == 0
-            song = Song.create(title: h[:title], artist: h[:artist], album: h[:album], genre: h[:genre], year: h[:year], track_id: h[:track_id], track_url: h[:track_url]) #adds songs, attr values nil by default
+            song = Song.create(title: h[:title], artist: h[:artist], album: h[:album], genre: h[:genre], year: h[:year], track_id: h[:track_id], track_url: h[:track_url], track_sample_url: h[:track_sample_url]) #adds songs, attr values nil by default
         else
             song = Song.where(title: h[:title]).where(artist: h[:artist]).first
         end
