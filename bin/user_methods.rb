@@ -123,19 +123,23 @@ def log_in
         Screen.title
         prompt = TTY::Prompt.new
         puts "Welcome, #{current_user.name}"
-        choices = ["View Playlists", "Create Playlist", "Delete Playlist", "Search For Songs", "Get Recommendations", "Delete User", "Log-out"]
+        choices = ["View Playlists", "Create Public Playlist", "Create Private Playlist", "Delete Playlist", "Search For Songs", "Get Recommendations", "Delete User", "Log-out"]
         user_menu_select = prompt.select("What would you like to do?", choices)
       
         loop do
             case user_menu_select
                 when 'View Playlists'
                     view_playlists ($current_user)
-                when 'Create Playlist'
+                when 'Create Public Playlist'
                     puts "What would you like to call this playlist?"
                     playlist_name = gets.chomp
-                    CurrentUser.create_playlist(current_user.name, playlist_name)
+                    CurrentUser.create_playlist(current_user.name, playlist_name, true)
                     user_menu(current_user)
-
+                when 'Create Private Playlist'
+                    puts "What would you like to call this playlist?"
+                    playlist_name = gets.chomp
+                    CurrentUser.create_playlist(current_user.name, playlist_name, false)
+                    user_menu(current_user)
                 when 'Delete Playlist'
                     user = User.where(name: current_user.name).first
                     choices = user.playlists.map{|playlist| playlist.name}

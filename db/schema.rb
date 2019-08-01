@@ -15,6 +15,7 @@ ActiveRecord::Schema.define(version: 2019_07_30_221111) do
   create_table "playlists", force: :cascade do |t|
     t.integer "user_id"
     t.string "name"
+    t.boolean "public"
     t.index ["user_id"], name: "index_playlists_on_user_id"
   end
 

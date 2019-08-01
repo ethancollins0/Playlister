@@ -6,7 +6,7 @@ class CurrentUser
     def self.make_user name
         if (name.strip.length > 0)
             user = User.create(name: name)
-            CurrentUser.create_playlist(name, 'Default Playlist')  
+            CurrentUser.create_playlist(name, 'Default Playlist', false)  
             user  
         else
             return nil
@@ -18,10 +18,10 @@ class CurrentUser
         Playlist.where(user_id: userId).where(name: playlistName).first.id
     end
 
-    def self.create_playlist username, playlistName
+    def self.create_playlist username, playlistName, isPublic
         inputId = User.where(name: username).first.id
         if Playlist.where(user_id: inputId).where(name: playlistName).count == 0
-            Playlist.create(user_id: inputId, name: playlistName)
+            Playlist.create(user_id: inputId, name: playlistName, public: isPublic)
         else
             "A playlist of that name already exists, please choose a different name or delete this playlist first."
         end
