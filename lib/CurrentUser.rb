@@ -65,7 +65,7 @@ class CurrentUser
     def self.delete_user username
         playlistArray = []
         CurrentUser.find_playlists(username).each_with_index do |value, index|
-            playlistArray << CurrentUser.find_playlists('bob')[index].name
+            playlistArray << CurrentUser.find_playlists(username)[index].name
         end
         playlistArray.each do |playlist|
             CurrentUser.delete_playlist(username, playlist)
