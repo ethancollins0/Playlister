@@ -70,6 +70,14 @@ class Search
         users_playlists = user.playlists.map{|playlist| playlist.name}
         puts "Enter a Song Name"
         user_input = gets.chomp.gsub(' ', '%20')
+        while user_input == "" || user_input[/\A[a-zA-Z1-9 '-]*\z/] == nil
+            puts "Error: Please enter a valid search query."
+            sleep(2)
+            system('clear')
+            Screen.title
+            puts "Enter a Song Name"
+            user_input = gets.chomp.gsub(' ', '%20')
+        end
         rest_client = RestClient.get(@@base_url + "/search?q=#{user_input}&type=#{search_type}&limit=10",
             'Authorization' => "Bearer #{GetData.access_token}")
         track_response = JSON.parse(rest_client)
@@ -78,6 +86,7 @@ class Search
             Search.tracks_select(track_parse, users_playlists)
         else
             puts "No Results Found"
+            sleep(2)
             Search.search_menu
         end
     end
@@ -90,6 +99,14 @@ class Search
         users_playlists = user.playlists.map{|playlist| playlist.name}
         puts "Enter an Artist Name"
         user_input = gets.chomp.gsub(' ', '%20')
+        while user_input == "" || user_input[/\A[a-zA-Z1-9 '-]*\z/] == nil
+            puts "Error: Please enter a valid search query."
+            sleep(2)
+            system('clear')
+            Screen.title
+            puts "Enter a Song Name"
+            user_input = gets.chomp.gsub(' ', '%20')
+        end
         rest_client = RestClient.get(@@base_url + "/search?q=#{user_input}&type=#{search_type}&limit=10",
             'Authorization' => "Bearer #{GetData.access_token}")
         artist_parse = JSON.parse(rest_client)
@@ -125,6 +142,7 @@ class Search
             end
         else
             puts "No Results Found"
+            sleep(2)
             Search.search_menu
         end
     end
@@ -138,6 +156,14 @@ class Search
         users_playlists = user.playlists.map{|playlist| playlist.name}
         puts "Enter an Album Name"
         user_input = gets.chomp.gsub(' ', '%20')
+        while user_input == "" || user_input[/\A[a-zA-Z1-9 '-]*\z/] == nil
+            puts "Error: Please enter a valid search query."
+            sleep(2)
+            system('clear')
+            Screen.title
+            puts "Enter a Song Name"
+            user_input = gets.chomp.gsub(' ', '%20')
+        end
         album_rest_client = RestClient.get(@@base_url + "/search?q=#{user_input}&type=#{search_type}&limit=10",
             'Authorization' => "Bearer #{GetData.access_token}")
         album_parse = JSON.parse(album_rest_client)
@@ -157,6 +183,7 @@ class Search
             Search.tracks_select(album_tracks_parse, users_playlists, selected_album, album_year)
         else
             puts "No Results Found"
+            sleep(2)
             Search.search_menu
         end
     end
