@@ -200,8 +200,8 @@ def user_menu(current_user)
             choice = prompt.select("Would you like to create a public or private playlist?", "Public Playlist", "Private Playlist")
             if choice == "Public Playlist"
                 puts "What would you like to call this playlist?"
-                playlist_name = gets.chomp
-                while playlist_name[/[a-zA-Z0-9]+/]  != playlist_name
+                playlist_name = gets.strip
+                while playlist_name[/[a-zA-Z0-9 ']+/]  != playlist_name || playlist_name == ""
                     puts "Please enter a valid playlist name."
                     sleep(2)
                     system('clear')
@@ -212,8 +212,8 @@ def user_menu(current_user)
                 CurrentUser.create_playlist(current_user.name, playlist_name, true)
             else
                 puts "What would you like to call this playlist?"
-                playlist_name = gets.chomp
-                while playlist_name[/[a-zA-Z0-9]+/]  != playlist_name
+                playlist_name = gets.strip
+                while playlist_name[/[a-zA-Z0-9 ']+/]  != playlist_name || playlist_name == ""
                     puts "Please enter a valid playlist name."
                     sleep(2)
                     system('clear')

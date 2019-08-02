@@ -33,13 +33,12 @@ class Search
         display_tracks = []
         if @@is_album == false
             track_parse.each do |item|
-                tracks_hash = {title: item['name'], artist: item['artists'][0]['name'], album: item['album']['name'].split(' - ').first, year: item['album']['release_date'].first(4), track_id: item['id'], track_url: item['external_urls']['spotify'], track_sample_url: item['preview_url']}
+                tracks_hash = {title: item['name'], artist: item['artists'][0]['name'], album: item['album']['name'].split(' - ').first, year: item['album']['release_date'].first(4), track_id: item['id'], track_url: item['external_urls']['spotify'], track_sample_url: item['preview_url'], duration: item['duration_ms']}
                 display_tracks << tracks_hash
             end
         else
             track_parse.each do |item|
-                #binding.pry
-                tracks_hash = {title: item['name'], artist: item['artists'][0]['name'], album: album_name.split(' - ').first, year: album_year, track_id: item['id'], track_url: item['external_urls']['spotify'], track_sample_url: item['preview_url']}
+                tracks_hash = {title: item['name'], artist: item['artists'][0]['name'], album: album_name.split(' - ').first, year: album_year, track_id: item['id'], track_url: item['external_urls']['spotify'], track_sample_url: item['preview_url'], duration: item['duration_ms']}
                 display_tracks << tracks_hash
             end
         end
@@ -116,6 +115,7 @@ class Search
         rest_client = RestClient.get(@@base_url + "/search?q=#{user_input}&type=#{search_type}&limit=10",
             'Authorization' => "Bearer #{GetData.access_token}")
         artist_parse = JSON.parse(rest_client)
+        # binding.pry
         if artist_parse['artists']['items'].count > 0
             artist_results = artist_parse['artists']['items']
             display_artists = artist_results.map{|artist| artist['name']}
