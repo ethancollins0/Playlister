@@ -1,13 +1,3 @@
-
- ______  _             _ _                      
-(_____ \| |           | (_)     _               
- _____) ) | ____ _   _| |_  ___| |_  ____  ____ 
-|  ____/| |/ _  | | | | | |/___)  _)/ _  )/ ___)
-| |     | ( ( | | |_| | | |___ | |_( (/ /| |    
-|_|     |_|\_||_|\__  |_|_(___/ \___)____)_|    
-                (____/                          using Spotify API
-
-
         Our project, Playlister, uses the spotify api to make queries and return songs, 
         and interact with playlists and songs in various ways. Using our CLI app, users 
         are able to:
