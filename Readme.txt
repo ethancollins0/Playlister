@@ -1,4 +1,3 @@
-
  ______  _             _ _                      
 (_____ \| |           | (_)     _               
  _____) ) | ____ _   _| |_  ___| |_  ____  ____ 
@@ -24,4 +23,8 @@
                 - Get recommended songs based on specific songs from playlist
                 - Play full song or sample songs from playlist (playing full song requires user to be logged into spotify on browser)
 
-        ![Pretty Fly For a Spotify API](giphy.gif)
+                ![](giphy.gif)
+        
+                    
+
+
