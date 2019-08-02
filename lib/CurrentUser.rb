@@ -37,12 +37,13 @@ class CurrentUser
         Playlistsong.create(song_id: song.id, playlist_id: playlistId)
     end
 
-    def self.delete_playlist username, playlistName #deletes playlist and songs
+    def self.delete_playlist username, playlistName, userDelete=false #deletes playlist and songs
         user = User.where(name: username).first
-        if user.playlists.count > 1
+        if user.playlists.count > 1 || userDelete == true
             playlistId = CurrentUser.get_playlist_id(username, playlistName)
             CurrentUser.delete_playlist_songs(username, playlistName)
             Playlist.where(id: playlistId).destroy_all
+            userDelete = false
         else
             puts "You shouldn't delete your only playlist! Where would you save songs?"
             sleep(3)
@@ -71,7 +72,7 @@ class CurrentUser
         user = User.where(name: username).first
         playlistArray = user.playlists
         playlistArray.each do |playlist|
-            CurrentUser.delete_playlist(username, playlist.name)
+            CurrentUser.delete_playlist(username, playlist.name, true)
         end
         User.where(name: username).destroy_all
     end
