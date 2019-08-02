@@ -38,9 +38,15 @@ class CurrentUser
     end
 
     def self.delete_playlist username, playlistName #deletes playlist and songs
-        playlistId = CurrentUser.get_playlist_id(username, playlistName)
-        CurrentUser.delete_playlist_songs(username, playlistName)
-        Playlist.where(id: playlistId).destroy_all
+        user = User.where(name: username).first
+        if user.playlists.count > 1
+            playlistId = CurrentUser.get_playlist_id(username, playlistName)
+            CurrentUser.delete_playlist_songs(username, playlistName)
+            Playlist.where(id: playlistId).destroy_all
+        else
+            puts "You shouldn't delete your only playlist! Where would you save songs?"
+            sleep(3)
+        end
     end
 
     def self.delete_playlist_songs username, playlistName #deletes all songs from a playlist (but leaves playlist)
