@@ -4,7 +4,7 @@ require 'pry'
 
 class CurrentUser
     def self.make_user name
-        if (name.strip.length > 0)
+        if name[/[a-zA-Z0-9]+/]  == name
             user = User.create(name: name)
             CurrentUser.create_playlist(name, 'Default Playlist', false)  
             user  
