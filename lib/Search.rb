@@ -70,7 +70,7 @@ class Search
         users_playlists = user.playlists.map{|playlist| playlist.name}
         puts "Enter a Song Name"
         user_input = gets.chomp.gsub(' ', '%20')
-        while user_input == ""
+        while user_input == "" || user_input[/\A[a-zA-Z1-9 '-]*\z/] == nil
             puts "Error: Please enter a valid search query."
             sleep(2)
             system('clear')
@@ -99,7 +99,7 @@ class Search
         users_playlists = user.playlists.map{|playlist| playlist.name}
         puts "Enter an Artist Name"
         user_input = gets.chomp.gsub(' ', '%20')
-        while user_input == ""
+        while user_input == "" || user_input[/\A[a-zA-Z1-9 '-]*\z/] == nil
             puts "Error: Please enter a valid search query."
             sleep(2)
             system('clear')
@@ -156,7 +156,7 @@ class Search
         users_playlists = user.playlists.map{|playlist| playlist.name}
         puts "Enter an Album Name"
         user_input = gets.chomp.gsub(' ', '%20')
-        while user_input == ""
+        while user_input == "" || user_input[/\A[a-zA-Z1-9 '-]*\z/] == nil
             puts "Error: Please enter a valid search query."
             sleep(2)
             system('clear')
