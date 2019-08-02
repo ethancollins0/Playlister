@@ -85,9 +85,8 @@ def select_playlist_songs(current_playlists, playlist_songs, current_user = nil,
                     yes_or_no = prompt.yes?("Delete Song?")
                     if yes_or_no == true
                         CurrentUser.delete_specific_song(current_user.name, selected_playlist, song_name)
-                        system("clear")
-                        Screen.title
-                        select = prompt.select("What do you want to do?", 'Play Song', 'Sample Song', 'Delete Song', 'Back')
+                        puts "Song deleted."
+                        view_playlists(current_user)
                     else
                         view_playlists(current_user)
                     end
@@ -175,6 +174,11 @@ def get_recommendations (current_user)
             rest_client = RestClient.get("https://api.spotify.com/v1/recommendations?seed_tracks=#{song_ids}", 'Authorization' => "Bearer #{GetData.access_token}")
             rec_tracks_response = JSON.parse(rest_client)
             rec_tracks_parse = rec_tracks_response['tracks']
+            if rec_tracks_parse == nil
+                puts "Sorry, no recommendations found. Please try again with different songs."
+                sleep(2)
+                user_menu($current_user)
+            end
             Search.tracks_select(rec_tracks_parse, users_playlists)
             user_menu($current_user)
     end
