@@ -13,10 +13,13 @@ class Search
         search_select = prompt.select("What would you like to search for?", choices)
         case search_select
         when 'Track'
+            @@is_album == false
             Search.search_track(search_select.downcase)
         when 'Artist'
+            @@is_album == false
             Search.search_artist(search_select.downcase)
         when 'Album'
+            @@is_album == true
             Search.search_album(search_select.downcase)
         when 'Back'
             user_menu($current_user)
@@ -35,6 +38,7 @@ class Search
             end
         else
             track_parse.each do |item|
+                #binding.pry
                 tracks_hash = {title: item['name'], artist: item['artists'][0]['name'], album: album_name.split(' - ').first, year: album_year, track_id: item['id'], track_url: item['external_urls']['spotify'], track_sample_url: item['preview_url']}
                 display_tracks << tracks_hash
             end
@@ -63,6 +67,7 @@ class Search
     end
 
     def self.search_track(search_type)
+        @@is_album = false
         system "clear"
         Screen.title
         prompt = TTY::Prompt.new
@@ -70,7 +75,7 @@ class Search
         users_playlists = user.playlists.map{|playlist| playlist.name}
         puts "Enter a Song Name"
         user_input = gets.chomp.gsub(' ', '%20')
-        while user_input == "" || user_input[/\A[a-zA-Z1-9 '-]*\z/] == nil
+        while user_input == "" || user_input[/\A[a-zA-Z1-9%20'-]*\z/] == nil
             puts "Error: Please enter a valid search query."
             sleep(2)
             system('clear')
@@ -92,6 +97,7 @@ class Search
     end
     
     def self.search_artist(search_type)
+        @@is_album = false
         system "clear"
         Screen.title
         prompt = TTY::Prompt.new
@@ -99,7 +105,7 @@ class Search
         users_playlists = user.playlists.map{|playlist| playlist.name}
         puts "Enter an Artist Name"
         user_input = gets.chomp.gsub(' ', '%20')
-        while user_input == "" || user_input[/\A[a-zA-Z1-9 '-]*\z/] == nil
+        while user_input == "" || user_input[/\A[a-zA-Z1-9%20'-]*\z/] == nil
             puts "Error: Please enter a valid search query."
             sleep(2)
             system('clear')
@@ -156,7 +162,7 @@ class Search
         users_playlists = user.playlists.map{|playlist| playlist.name}
         puts "Enter an Album Name"
         user_input = gets.chomp.gsub(' ', '%20')
-        while user_input == "" || user_input[/\A[a-zA-Z1-9 '-]*\z/] == nil
+        while user_input == "" || user_input[/\A[a-zA-Z1-9%20'-]*\z/] == nil
             puts "Error: Please enter a valid search query."
             sleep(2)
             system('clear')
