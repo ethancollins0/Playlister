@@ -138,6 +138,7 @@ def view_playlists (current_user)
             user_menu(current_user)
     end
 end
+
 def get_recommendations (current_user)
     prompt = TTY::Prompt.new
     user = User.where(name: current_user.name).first
