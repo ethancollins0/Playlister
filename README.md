@@ -22,4 +22,7 @@
                 - Save songs to playlists
                 - Delete playlists and songs from playlists
                 - Get recommended songs based on specific songs from playlist
-                - Play full song or sample songs from playlist (playing full song requires user to be logged into spotify on browser)
+                - Play full song or sample songs from playlist 
+                (full song requires user to be logged into spotify)
+
+                ![Pretty Fly For a Spotify API][/giphy.gif]
