@@ -78,6 +78,7 @@ class Search
             Search.tracks_select(track_parse, users_playlists)
         else
             puts "No Results Found"
+            sleep(2)
             Search.search_menu
         end
     end
@@ -125,6 +126,7 @@ class Search
             end
         else
             puts "No Results Found"
+            sleep(2)
             Search.search_menu
         end
     end
@@ -157,6 +159,7 @@ class Search
             Search.tracks_select(album_tracks_parse, users_playlists, selected_album, album_year)
         else
             puts "No Results Found"
+            sleep(2)
             Search.search_menu
         end
     end
