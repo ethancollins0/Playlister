@@ -25,4 +25,4 @@
                 - Play full song or sample songs from playlist 
                 (full song requires user to be logged into spotify)
 
-                ![Pretty Fly For a Spotify API][rockin.gif]
+                ![Pretty Fly For a Spotify API](rockin.gif)
