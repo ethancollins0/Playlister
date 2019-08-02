@@ -33,6 +33,7 @@ def log_in
 end
     
 def welcome
+    pid = fork{exec 'afplay', "./Intro.mp3"}
     system "clear"
     Screen.main_title
     prompt = TTY::Prompt.new
@@ -156,13 +157,20 @@ def get_recommendations (current_user)
         playlist_songs = Playlist.where(name: selected).where(user_id: current_user.id).first.songs
         choices = playlist_songs.map{|song| "#{song.title} - #{song.artist} - #{song.album}"}
         selected_songs = prompt.multi_select("Choose up to five songs to get recommendations", choices)
-        song_names = selected_songs.map{|song| song.split(" - ").first.strip}
-        song_ids = CurrentUser.get_song_ids(song_names).join("%2C")
-        rest_client = RestClient.get("https://api.spotify.com/v1/recommendations?seed_tracks=#{song_ids}", 'Authorization' => "Bearer #{GetData.access_token}")
-        rec_tracks_response = JSON.parse(rest_client)
-        rec_tracks_parse = rec_tracks_response['tracks']
-        Search.tracks_select(rec_tracks_parse, users_playlists)
-        user_menu($current_user)
+        while selected_songs.count == 0
+            puts "Please select songs with the 'spacebar'"
+            sleep(1.5)
+            system("clear")
+            Screen.title
+            selected_songs = prompt.multi_select("Choose up to five songs to get recommendations", choices)
+        end
+            song_names = selected_songs.map{|song| song.split(" - ").first.strip}
+            song_ids = CurrentUser.get_song_ids(song_names).join("%2C")
+            rest_client = RestClient.get("https://api.spotify.com/v1/recommendations?seed_tracks=#{song_ids}", 'Authorization' => "Bearer #{GetData.access_token}")
+            rec_tracks_response = JSON.parse(rest_client)
+            rec_tracks_parse = rec_tracks_response['tracks']
+            Search.tracks_select(rec_tracks_parse, users_playlists)
+            user_menu($current_user)
     end
 end
 

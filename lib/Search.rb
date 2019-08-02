@@ -42,24 +42,24 @@ class Search
         loop do
             system("clear")
             Screen.title        
-        choices = display_tracks.map.with_index(1) do |track| 
-            "#{track[:title]} - #{track[:artist]} - #{track[:album]}"
+            choices = display_tracks.map.with_index(1) do |track| 
+                "#{track[:title]} - #{track[:artist]} - #{track[:album]}"
+            end
+            selected_song = prompt.select("Select a song to save", 'Back', choices)
+            if selected_song == 'Back'
+                user_menu($current_user)
+            else
+                puts selected_song
+                song_index = choices.index{|song| song == selected_song}
+                yes_or_no = prompt.select("Save this song to a playlist?", %w[Yes No])
+                if yes_or_no == 'Yes'
+                selected_playlist = prompt.select("Select a playlist to add this song to", users_playlists)
+                current_song = display_tracks[song_index]
+                CurrentUser.save_song(current_song, $current_user.name, selected_playlist)
+                puts "Saved Song to Playlist!"
+                end
+            end
         end
-        selected_song = prompt.select("Select a song to save", 'Back', choices)
-        if selected_song == 'Back'
-            user_menu($current_user)
-        else
-        puts selected_song
-        song_index = choices.index{|song| song == selected_song}
-        yes_or_no = prompt.select("Save this song to a playlist?", %w[Yes No])
-        if yes_or_no == 'Yes'
-            selected_playlist = prompt.select("Select a playlist to add this song to", users_playlists)
-            current_song = display_tracks[song_index]
-            CurrentUser.save_song(current_song, $current_user.name, selected_playlist)
-            puts "Saved Song to Playlist!"
-        end
-    end
-    end
     end
 
     def self.search_track(search_type)
