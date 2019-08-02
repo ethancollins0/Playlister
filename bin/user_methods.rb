@@ -10,7 +10,7 @@ def create_user
     input = gets.chomp
     $current_user = CurrentUser.make_user(input)
     if $current_user == nil
-        puts 'Invalid input, please enter a name without only spaces.'
+        puts 'Invalid input, please enter a name with at least one letter or number.'
         sleep(2)
         create_user
     end
@@ -79,6 +79,8 @@ def select_playlist_songs(current_playlists, playlist_songs, current_user = nil,
                     yes_or_no = prompt.yes?("Delete Song?")
                     if yes_or_no == true
                         CurrentUser.delete_specific_song(current_user.name, selected_playlist, song_name)
+                        system('clear')
+                        select = prompt.select("What do you want to do?", 'Play Song', 'Sample Song', 'Delete Song', 'Back')   
                     else
                         view_playlists(current_user)
                     end
@@ -136,6 +138,13 @@ def get_recommendations (current_user)
     else
         system "clear"
         Screen.title
+
+        if Playlist.where(name: selected).first.songs.count == 0
+            puts "No songs found in playlist, please add songs then try again."
+            sleep(2)
+            user_menu(current_user)
+        end
+
         puts "Viewing Playlist #{selected}"
         playlist_songs = Playlist.where(name: selected).where(user_id: current_user.id).first.songs
         choices = playlist_songs.map{|song| "#{song.title} - #{song.artist} - #{song.album}"}
@@ -155,20 +164,23 @@ def user_menu(current_user)
     Screen.title
     prompt = TTY::Prompt.new
     puts "Welcome, #{current_user.name}"
-    choices = ["View Playlists", "Create Public Playlist", "Create Private Playlist", "Delete Playlist", "Search For Songs", "Get Recommendations", "Delete User", "Log-out"]
+    choices = ["View Playlists", "Create Playlist", "Delete Playlist", "Search For Songs", "Get Recommendations", "Delete User", "Log-out"]
     user_menu_select = prompt.select("What would you like to do?", choices)
     case user_menu_select
         when 'View Playlists'
             view_playlists ($current_user)
-        when 'Create Public Playlist'
-            puts "What would you like to call this playlist?"
-            playlist_name = gets.chomp
-            CurrentUser.create_playlist(current_user.name, playlist_name, true)
-            user_menu(current_user)
-        when 'Create Private Playlist'
-            puts "What would you like to call this playlist?"
-            playlist_name = gets.chomp
-            CurrentUser.create_playlist(current_user.name, playlist_name, false)
+        when 'Create Playlist'
+            prompt = TTY::Prompt.new
+            choice = prompt.select("Would you like to create a public or private playlist?", "Public Playlist", "Private Playlist")
+            if choice == "Public Playlist"
+                puts "What would you like to call this playlist?"
+                playlist_name = gets.chomp
+                CurrentUser.create_playlist(current_user.name, playlist_name, true)
+            else
+                puts "What would you like to call this playlist?"
+                playlist_name = gets.chomp
+                CurrentUser.create_playlist(current_user.name, playlist_name, false)
+            end
             user_menu(current_user)
         when 'Delete Playlist'
             user = User.where(name: current_user.name).first
