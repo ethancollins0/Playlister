@@ -56,12 +56,27 @@ class CurrentUser
     end
 
     def self.delete_specific_song username, playlistName, songTitle
+        playlists = Playlist.where(name: playlistName)
+        user = User.where(name: username).first
+        myPlaylist = playlists.select {|playlist| playlist.user_id == user.id}
         songId = Song.where(title: songTitle).first.id
-        playlistId = CurrentUser.get_playlist_id(username, playlistName)
-        if songId != nil
-            delete_id = Playlistsong.where(playlist_id: playlistId).where(song_id: songId).first.id
+        if myPlaylist.count > 0
+            delete_id = Playlistsong.where(playlist_id: myPlaylist.first.id, song_id: songId).first.id
             Playlistsong.destroy(delete_id)
+        else
+            puts "You can't delete songs from other people's playlists."
+            sleep(2)
         end
+    #     songId = Song.where(title: songTitle).first.id
+    #     user = User.where(name: username).first
+    #     matched_playlists = Playlist.where(name: playlistName)
+    #     to_delete = matched_playlists.select {|playlist| playlist.user_id == user.id}
+
+    #     if to_delete.count > 0
+    #         song_delete_id = Playlistsong.where(playlist_id: to_delete.first.id, song_id: songId)
+    #         binding.pry
+    #         Playlistsong.destroy(song_delete_id)
+    #     end
     end
 
     def self.get_song_ids songArray

@@ -85,9 +85,8 @@ def select_playlist_songs(current_playlists, playlist_songs, current_user = nil,
                     yes_or_no = prompt.yes?("Delete Song?")
                     if yes_or_no == true
                         CurrentUser.delete_specific_song(current_user.name, selected_playlist, song_name)
-                        system("clear")
-                        Screen.title
-                        select = prompt.select("What do you want to do?", 'Play Song', 'Sample Song', 'Delete Song', 'Back')
+                        puts "Song deleted."
+                        view_playlists(current_user)
                     else
                         view_playlists(current_user)
                     end
@@ -174,7 +173,13 @@ def get_recommendations (current_user)
             song_ids = CurrentUser.get_song_ids(song_names).join("%2C")
             rest_client = RestClient.get("https://api.spotify.com/v1/recommendations?seed_tracks=#{song_ids}", 'Authorization' => "Bearer #{GetData.access_token}")
             rec_tracks_response = JSON.parse(rest_client)
+            if rec_tracks_response['tracks'].count == 0
+                puts "No recommendations found, please try again with different songs."
+                sleep(2)
+                user_menu(current_user)
+            end
             rec_tracks_parse = rec_tracks_response['tracks']
+            #binding.pry
             Search.tracks_select(rec_tracks_parse, users_playlists)
             user_menu($current_user)
     end
@@ -195,8 +200,8 @@ def user_menu(current_user)
             choice = prompt.select("Would you like to create a public or private playlist?", "Public Playlist", "Private Playlist")
             if choice == "Public Playlist"
                 puts "What would you like to call this playlist?"
-                playlist_name = gets.chomp
-                while playlist_name[/[a-zA-Z0-9]+/]  != playlist_name
+                playlist_name = gets.strip
+                while playlist_name[/[a-zA-Z0-9 ']+/]  != playlist_name || playlist_name == ""
                     puts "Please enter a valid playlist name."
                     sleep(2)
                     system('clear')
@@ -207,8 +212,8 @@ def user_menu(current_user)
                 CurrentUser.create_playlist(current_user.name, playlist_name, true)
             else
                 puts "What would you like to call this playlist?"
-                playlist_name = gets.chomp
-                while playlist_name[/[a-zA-Z0-9]+/]  != playlist_name
+                playlist_name = gets.strip
+                while playlist_name[/[a-zA-Z0-9 ']+/]  != playlist_name || playlist_name == ""
                     puts "Please enter a valid playlist name."
                     sleep(2)
                     system('clear')
