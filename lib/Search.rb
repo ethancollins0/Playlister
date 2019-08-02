@@ -2,15 +2,15 @@ require 'rest-client'
 require 'json'
 
 class Search
-
     @@is_album = false
     @@base_url = "https://api.spotify.com/v1"
     def self.search_menu
+        pastel = Pastel.new
         system "clear"
         Screen.title
         prompt = TTY::Prompt.new
         choices = ["Track", "Artist", "Album", "Back"]
-        search_select = prompt.select("What would you like to search for?", choices)
+        search_select = prompt.select(pastel.bold("What would you like to search for?"), choices)
         case search_select
         when 'Track'
             @@is_album == false
@@ -26,60 +26,67 @@ class Search
         end
     end
     
-    def self.tracks_select (track_parse, users_playlists, album_name = nil, album_year = nil)
+    def self.tracks_select (track_parse, users_playlists, album_name = nil, album_year = nil, is_rec = false)
+        pastel = Pastel.new
         system "clear"
         Screen.title
         prompt = TTY::Prompt.new
         display_tracks = []
-        if @@is_album == false
-            track_parse.each do |item|
-                tracks_hash = {title: item['name'], artist: item['artists'][0]['name'], album: item['album']['name'].split(' - ').first, year: item['album']['release_date'].first(4), track_id: item['id'], track_url: item['external_urls']['spotify'], track_sample_url: item['preview_url'], duration: item['duration_ms']}
-                display_tracks << tracks_hash
+            if album_name == nil
+                track_parse.each do |item|
+                    tracks_hash = {title: item['name'], artist: item['artists'][0]['name'], album: item['album']['name'].split(' - ').first, year: item['album']['release_date'].first(4), track_id: item['id'], track_url: item['external_urls']['spotify'], track_sample_url: item['preview_url'], duration: item['duration_ms']}
+                    display_tracks << tracks_hash
+                end
+            else
+                track_parse.each do |item|
+                    tracks_hash = {title: item['name'], artist: item['artists'][0]['name'], album: album_name.split(' - ').first, year: album_year, track_id: item['id'], track_url: item['external_urls']['spotify'], track_sample_url: item['preview_url'], duration: item['duration_ms']}
+                    display_tracks << tracks_hash
+                end
             end
-        else
-            track_parse.each do |item|
-                tracks_hash = {title: item['name'], artist: item['artists'][0]['name'], album: album_name.split(' - ').first, year: album_year, track_id: item['id'], track_url: item['external_urls']['spotify'], track_sample_url: item['preview_url'], duration: item['duration_ms']}
-                display_tracks << tracks_hash
-            end
-        end
         loop do
             system("clear")
             Screen.title        
             choices = display_tracks.map.with_index(1) do |track| 
                 "#{track[:title]} - #{track[:artist]} - #{track[:album]}"
             end
-            selected_song = prompt.select("Select a song to save", 'Back', choices)
+            selected_song = prompt.select(pastel.bold("Select a song to save"), 'Back', choices)
             if selected_song == 'Back'
-                user_menu($current_user)
+                if is_rec == false
+                Search.search_menu
+                else
+                get_recommendations($current_user)
+                end
             else
                 puts selected_song
                 song_index = choices.index{|song| song == selected_song}
-                yes_or_no = prompt.select("Save this song to a playlist?", %w[Yes No])
+                yes_or_no = prompt.select(pastel.bold("Save this song to a playlist?"), %w[Yes No])
                 if yes_or_no == 'Yes'
-                selected_playlist = prompt.select("Select a playlist to add this song to", users_playlists)
+                selected_playlist = prompt.select(pastel.bold("Select a playlist to add this song to"), users_playlists)
                 current_song = display_tracks[song_index]
                 CurrentUser.save_song(current_song, $current_user.name, selected_playlist)
-                puts "Saved Song to Playlist!"
+                puts pastel.bright_green.bold("Saved Song to #{selected_playlist}!")
+                sleep(1)
                 end
             end
         end
     end
 
     def self.search_track(search_type)
+        pastel = Pastel.new
         @@is_album = false
         system "clear"
         Screen.title
         prompt = TTY::Prompt.new
         user = User.where(name: $current_user.name).first
         users_playlists = user.playlists.map{|playlist| playlist.name}
-        puts "Enter a Song Name"
+        puts pastel.bold("Enter a Song Name")
         user_input = gets.chomp.gsub(' ', '%20')
         while user_input == "" || user_input[/\A[a-zA-Z1-9%20'-]*\z/] == nil
-            puts "Error: Please enter a valid search query."
+            puts pastel.red.bold("Error: Please enter a valid search query.")
             sleep(2)
             system('clear')
             Screen.title
-            puts "Enter a Song Name"
+            puts pastel.bold("Enter a Song Name")
             user_input = gets.chomp.gsub(' ', '%20')
         end
         rest_client = RestClient.get(@@base_url + "/search?q=#{user_input}&type=#{search_type}&limit=10",
@@ -89,27 +96,28 @@ class Search
             track_parse = track_response['tracks']['items']
             Search.tracks_select(track_parse, users_playlists)
         else
-            puts "No Results Found"
+            puts pastel.bold("No Results Found")
             sleep(2)
             Search.search_menu
         end
     end
     
     def self.search_artist(search_type)
+        pastel = Pastel.new
         @@is_album = false
         system "clear"
         Screen.title
         prompt = TTY::Prompt.new
         user = User.where(name: $current_user.name).first
         users_playlists = user.playlists.map{|playlist| playlist.name}
-        puts "Enter an Artist Name"
+        puts pastel.bold("Enter an Artist Name")
         user_input = gets.chomp.gsub(' ', '%20')
         while user_input == "" || user_input[/\A[a-zA-Z1-9%20'-]*\z/] == nil
-            puts "Error: Please enter a valid search query."
+            puts pastel.red.bold("Error: Please enter a valid search query.")
             sleep(2)
             system('clear')
             Screen.title
-            puts "Enter a Song Name"
+            puts pastel.bold("Enter an Artist Name")
             user_input = gets.chomp.gsub(' ', '%20')
         end
         rest_client = RestClient.get(@@base_url + "/search?q=#{user_input}&type=#{search_type}&limit=10",
@@ -119,10 +127,10 @@ class Search
         if artist_parse['artists']['items'].count > 0
             artist_results = artist_parse['artists']['items']
             display_artists = artist_results.map{|artist| artist['name']}
-            selected_artist = prompt.select("Select an Artist", display_artists)
+            selected_artist = prompt.select(pastel.bold("Select an Artist"), display_artists)
             artist_index = display_artists.index{|artist| artist == selected_artist}
             artist_id = artist_results[artist_index]['id']
-            top_tracks_or_albums = prompt.select("View #{selected_artist}'s:'", ["Top Tracks", "Albums"])
+            top_tracks_or_albums = prompt.select(pastel.bold("View #{selected_artist}'s:'"), ["Top Tracks", "Albums"])
             if top_tracks_or_albums == 'Top Tracks'
                 tt_rest_client = RestClient.get(@@base_url + "/artists/#{artist_id}/top-tracks?country=ES",
                             'Authorization' => "Bearer #{GetData.access_token}")
@@ -135,7 +143,7 @@ class Search
                     'Authorization' => "Bearer #{GetData.access_token}")
                 artist_albums_parse = JSON.parse(arist_album_rest_client)
                 display_artist_albums = artist_albums_parse['items'].map{|album| album['name']}
-                selected_album = prompt.select("Select an Album", display_artist_albums)
+                selected_album = prompt.select(pastel.bold("Select an Album"), display_artist_albums)
                 album_index = display_artist_albums.index{|album| album == selected_album}
                 album_id = artist_albums_parse['items'][album_index]['id']
                 base_url = "https://api.spotify.com/v1/"
@@ -147,27 +155,28 @@ class Search
                 Search.tracks_select(album_tracks_parse, users_playlists, selected_album, album_year)
             end
         else
-            puts "No Results Found"
-            sleep(2)
+            puts pastel.bold("No Results Found")
+            sleep(1)
             Search.search_menu
         end
     end
     
     def self.search_album(search_type)
+        pastel = Pastel.new
         system "clear"
         Screen.title
         prompt = TTY::Prompt.new
         @@is_album = true
         user = User.where(name: $current_user.name).first
         users_playlists = user.playlists.map{|playlist| playlist.name}
-        puts "Enter an Album Name"
+        puts pastel.bold("Enter an Album Name")
         user_input = gets.chomp.gsub(' ', '%20')
         while user_input == "" || user_input[/\A[a-zA-Z1-9%20'-]*\z/] == nil
-            puts "Error: Please enter a valid search query."
+            puts pastel.red.bold("Error: Please enter a valid search query.")
             sleep(2)
             system('clear')
             Screen.title
-            puts "Enter a Song Name"
+            puts pastel.bold("Enter a Song Name")
             user_input = gets.chomp.gsub(' ', '%20')
         end
         album_rest_client = RestClient.get(@@base_url + "/search?q=#{user_input}&type=#{search_type}&limit=10",
@@ -177,7 +186,7 @@ class Search
             display_albums = album_parse['albums']['items'].map{|album| album['name']}
             album_results = album_parse['albums']['items']
             display_albums = album_results.map{|album| "#{album['name']} - #{album['artists'][0]['name']}"}
-            selected_album = prompt.select("Select an Album", display_albums)
+            selected_album = prompt.select(pastel.bold("Select an Album"), display_albums)
             album_index = display_albums.index{|album| album == selected_album}
             album_id = album_results[album_index]['id']
             base_url = "https://api.spotify.com/v1/"
@@ -188,8 +197,8 @@ class Search
             album_year = album_parse['albums']['items'][album_index]['release_date'].first(4)
             Search.tracks_select(album_tracks_parse, users_playlists, selected_album, album_year)
         else
-            puts "No Results Found"
-            sleep(2)
+            puts pastel.bold("No Results Found")
+            sleep(1)
             Search.search_menu
         end
     end
