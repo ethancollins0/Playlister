@@ -166,6 +166,14 @@ def get_recommendations (current_user)
             Screen.title
             selected_songs = prompt.multi_select("Choose up to five songs to get recommendations", choices)
         end
+
+        while selected_songs.count > 5
+            puts Rainbow("Please only select up to 5 songs.").red
+            sleep(2)
+            system('clear')
+            Screen.title
+            selected_songs = prompt.multi_select("Choose up to five songs to get recommendations", choices)
+        end
             song_names = selected_songs.map{|song| song.split(" - ").first.strip}
             song_ids = CurrentUser.get_song_ids(song_names).join("%2C")
             rest_client = RestClient.get("https://api.spotify.com/v1/recommendations?seed_tracks=#{song_ids}", 'Authorization' => "Bearer #{GetData.access_token}")
