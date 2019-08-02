@@ -70,6 +70,14 @@ class Search
         users_playlists = user.playlists.map{|playlist| playlist.name}
         puts "Enter a Song Name"
         user_input = gets.chomp.gsub(' ', '%20')
+        while user_input == ""
+            puts "Error: Please enter a valid search query."
+            sleep(2)
+            system('clear')
+            Screen.title
+            puts "Enter a Song Name"
+            user_input = gets.chomp.gsub(' ', '%20')
+        end
         rest_client = RestClient.get(@@base_url + "/search?q=#{user_input}&type=#{search_type}&limit=10",
             'Authorization' => "Bearer #{GetData.access_token}")
         track_response = JSON.parse(rest_client)
@@ -91,6 +99,14 @@ class Search
         users_playlists = user.playlists.map{|playlist| playlist.name}
         puts "Enter an Artist Name"
         user_input = gets.chomp.gsub(' ', '%20')
+        while user_input == ""
+            puts "Error: Please enter a valid search query."
+            sleep(2)
+            system('clear')
+            Screen.title
+            puts "Enter a Song Name"
+            user_input = gets.chomp.gsub(' ', '%20')
+        end
         rest_client = RestClient.get(@@base_url + "/search?q=#{user_input}&type=#{search_type}&limit=10",
             'Authorization' => "Bearer #{GetData.access_token}")
         artist_parse = JSON.parse(rest_client)
@@ -140,6 +156,14 @@ class Search
         users_playlists = user.playlists.map{|playlist| playlist.name}
         puts "Enter an Album Name"
         user_input = gets.chomp.gsub(' ', '%20')
+        while user_input == ""
+            puts "Error: Please enter a valid search query."
+            sleep(2)
+            system('clear')
+            Screen.title
+            puts "Enter a Song Name"
+            user_input = gets.chomp.gsub(' ', '%20')
+        end
         album_rest_client = RestClient.get(@@base_url + "/search?q=#{user_input}&type=#{search_type}&limit=10",
             'Authorization' => "Bearer #{GetData.access_token}")
         album_parse = JSON.parse(album_rest_client)
