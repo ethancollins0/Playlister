@@ -173,12 +173,13 @@ def get_recommendations (current_user)
             song_ids = CurrentUser.get_song_ids(song_names).join("%2C")
             rest_client = RestClient.get("https://api.spotify.com/v1/recommendations?seed_tracks=#{song_ids}", 'Authorization' => "Bearer #{GetData.access_token}")
             rec_tracks_response = JSON.parse(rest_client)
-            rec_tracks_parse = rec_tracks_response['tracks']
-            if rec_tracks_parse == nil
-                puts "Sorry, no recommendations found. Please try again with different songs."
+            if rec_tracks_response['tracks'].count == 0
+                puts "No recommendations found, please try again with different songs."
                 sleep(2)
-                user_menu($current_user)
+                user_menu(current_user)
             end
+            rec_tracks_parse = rec_tracks_response['tracks']
+            #binding.pry
             Search.tracks_select(rec_tracks_parse, users_playlists)
             user_menu($current_user)
     end
