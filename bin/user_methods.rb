@@ -51,14 +51,14 @@ end
 def select_playlist_songs(current_playlists, playlist_songs, current_user = nil, selected_playlist = nil)
     pastel = Pastel.new
     prompt = TTY::Prompt.new
-    choices = playlist_songs.map{|song| "#{song.title} - #{song.artist} - #{song.album}"}
+    choices = playlist_songs.map{|song| "#{song.title} | #{song.artist} | #{song.album}"}
 
     selected_song = prompt.select(pastel.bold("Choose a Song"), choices, 'Back')
     if selected_song == 'Back'
         view_playlists(current_user)
     else
         puts selected_song
-        song_name = selected_song.split("-").first.strip
+        song_name = selected_song.split(" | ").first.strip
         song_url = Song.where(title: song_name).first.track_url
         song_sample_url = Song.where(title: song_name).first.track_sample_url
         select = prompt.select(pastel.bold("What do you want to do?"), 'Back', 'Play Song', 'Sample Song', 'Delete Song')
@@ -165,7 +165,7 @@ def get_recommendations (current_user)
 
         puts pastel.bold("Viewing Playlist #{selected}")
         playlist_songs = Playlist.where(name: selected).where(user_id: current_user.id).first.songs
-        choices = playlist_songs.map{|song| "#{song.title} - #{song.artist} - #{song.album}"}
+        choices = playlist_songs.map{|song| "#{song.title} | #{song.artist} | #{song.album}"}
         selected_songs = prompt.multi_select(pastel.bold("Choose up to five songs for recommendations"), choices)
         while selected_songs.count == 0 || selected_songs.count > 5
             puts pastel.red.bold("Please select only up to five songs with the 'spacebar'")
@@ -175,7 +175,7 @@ def get_recommendations (current_user)
             selected_songs = prompt.multi_select(pastel.bold("Choose up to five songs for recommendations"), choices)
         end
             song_array = playlist_songs.map{|song| song.title}
-            song_names = selected_songs.map{|song| song.split(" - ").first.strip}
+            song_names = selected_songs.map{|song| song.split(" | ").first.strip}
             songs = []
             song_array.select do |song|
                 song_names.each do |name|

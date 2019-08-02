@@ -34,12 +34,12 @@ class Search
         display_tracks = []
             if album_name == nil
                 track_parse.each do |item|
-                    tracks_hash = {title: item['name'], artist: item['artists'][0]['name'], album: item['album']['name'].split(' - ').first, year: item['album']['release_date'].first(4), track_id: item['id'], track_url: item['external_urls']['spotify'], track_sample_url: item['preview_url'], duration: item['duration_ms']}
+                    tracks_hash = {title: item['name'], artist: item['artists'][0]['name'], album: item['album']['name'].split(' | ').first, year: item['album']['release_date'].first(4), track_id: item['id'], track_url: item['external_urls']['spotify'], track_sample_url: item['preview_url'], duration: item['duration_ms']}
                     display_tracks << tracks_hash
                 end
             else
                 track_parse.each do |item|
-                    tracks_hash = {title: item['name'], artist: item['artists'][0]['name'], album: album_name.split(' - ').first, year: album_year, track_id: item['id'], track_url: item['external_urls']['spotify'], track_sample_url: item['preview_url'], duration: item['duration_ms']}
+                    tracks_hash = {title: item['name'], artist: item['artists'][0]['name'], album: album_name.split(' | ').first, year: album_year, track_id: item['id'], track_url: item['external_urls']['spotify'], track_sample_url: item['preview_url'], duration: item['duration_ms']}
                     display_tracks << tracks_hash
                 end
             end
@@ -47,7 +47,7 @@ class Search
             system("clear")
             Screen.title        
             choices = display_tracks.map.with_index(1) do |track| 
-                "#{track[:title]} - #{track[:artist]} - #{track[:album]}"
+                "#{track[:title]} | #{track[:artist]} | #{track[:album]}"
             end
             selected_song = prompt.select(pastel.bold("Select a song to save"), 'Back', choices)
             if selected_song == 'Back'
@@ -185,7 +185,7 @@ class Search
         if album_parse['albums']['items'].count > 0
             display_albums = album_parse['albums']['items'].map{|album| album['name']}
             album_results = album_parse['albums']['items']
-            display_albums = album_results.map{|album| "#{album['name']} - #{album['artists'][0]['name']}"}
+            display_albums = album_results.map{|album| "#{album['name']} | #{album['artists'][0]['name']}"}
             selected_album = prompt.select(pastel.bold("Select an Album"), display_albums)
             album_index = display_albums.index{|album| album == selected_album}
             album_id = album_results[album_index]['id']
