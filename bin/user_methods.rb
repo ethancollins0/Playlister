@@ -49,11 +49,9 @@ end
 
 def select_playlist_songs(current_playlists, playlist_songs, current_user = nil, selected_playlist = nil)
     prompt = TTY::Prompt.new
-    if playlist_songs[0][0] == nil
+
         choices = playlist_songs.map{|song| "#{song.title} - #{song.artist} - #{song.album}"}
-    else
-        choices = playlist_songs[0].map {|song| "#{song.title} - #{song.artist} - #{song.album}"}
-    end
+
     selected_song = prompt.select("Choose a Song", choices, 'Back')
     if selected_song == 'Back'
         view_playlists(current_user)
@@ -134,7 +132,7 @@ def view_playlists (current_user)
                     playlist_songs = Playlist.all.select{|playlist| filtered_songs << playlist.songs unless playlist.songs == [] || playlist.public == false}
                     selected_playlist = selected
                     #binding.pry
-                    select_playlist_songs(current_playlists, filtered_songs, current_user, selected_playlist)
+                    select_playlist_songs(current_playlists, filtered_songs.flatten, current_user, selected_playlist)
                 end
         when 'Back'
             user_menu(current_user)
