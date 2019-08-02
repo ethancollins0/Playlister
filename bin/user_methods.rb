@@ -63,22 +63,28 @@ def select_playlist_songs(current_playlists, playlist_songs, current_user = nil,
                 when 'Play Song'
                     system("open", song_url)
                     system("clear")
+                    Screen.title
                     select = prompt.select("What do you want to do?", 'Play Song', 'Sample Song', 'Delete Song', 'Back')
                 when 'Sample Song'
                     if song_sample_url == nil
                         puts "No Sample Available"
                         sleep(1)
                         system("clear")
+                        Screen.title
                         select = prompt.select("What do you want to do?", 'Play Song', 'Sample Song', 'Delete Song', 'Back')     
                     else
                         system("open", song_sample_url)
                         system("clear")
+                        Screen.title
                         select = prompt.select("What do you want to do?", 'Play Song', 'Sample Song', 'Delete Song', 'Back')
                     end
                 when 'Delete Song'
                     yes_or_no = prompt.yes?("Delete Song?")
                     if yes_or_no == true
                         CurrentUser.delete_specific_song(current_user.name, selected_playlist, song_name)
+                        system("clear")
+                        Screen.title
+                        select = prompt.select("What do you want to do?", 'Play Song', 'Sample Song', 'Delete Song', 'Back')
                     else
                         view_playlists(current_user)
                     end
@@ -94,35 +100,38 @@ def view_playlists (current_user)
     system "clear"
     Screen.title
     prompt = TTY::Prompt.new
-    playlist_select = prompt.select("Would you like to see your playlists or other user's playlists?", 'My Playlists', 'All Playlists')
+    playlist_select = prompt.select("Would you like to see your playlists or other user's playlists?", 'My Playlists', 'All Playlists', 'Back')
     user = User.where(name: current_user.name).first
-    if playlist_select == 'My Playlists'
-        current_playlists = user.playlists
-        selected = prompt.select("Select a playlist", current_playlists.map{|playlist| playlist.name}, 'Back')
-        if selected == 'Back'
-            user_menu(current_user)
-        else
-            selected_playlist = selected
-            system "clear"
-            Screen.title
-            puts "Viewing Playlist #{selected}"
-            playlist_songs = Playlist.where(name: selected).where(user_id: current_user.id).first.songs
-            select_playlist_songs(current_playlists, playlist_songs, current_user, selected_playlist)
-        end
-    else
-        current_playlists = Playlist.where(public: true)
-        selected = prompt.select("Select a playlist", current_playlists.map{|playlist| playlist.name}, 'Back')
+    case playlist_select
+        when 'My Playlists'
+            current_playlists = user.playlists
+            selected = prompt.select("Select a playlist", current_playlists.map{|playlist| playlist.name}, 'Back')
             if selected == 'Back'
                 user_menu(current_user)
             else
+                selected_playlist = selected
                 system "clear"
                 Screen.title
                 puts "Viewing Playlist #{selected}"
-                filtered_songs = [] 
-                playlist_songs = Playlist.all.select{|playlist| filtered_songs << playlist.songs unless playlist.songs == [] || playlist.public == false}
-                selected_playlist = selected
-                select_playlist_songs(current_playlists, filtered_songs[0], current_user, selected_playlist)
+                playlist_songs = Playlist.where(name: selected).where(user_id: current_user.id).first.songs
+                select_playlist_songs(current_playlists, playlist_songs, current_user, selected_playlist)
             end
+        when 'All Playlists'
+            current_playlists = Playlist.where(public: true)
+            selected = prompt.select("Select a playlist", current_playlists.map{|playlist| playlist.name}, 'Back')
+                if selected == 'Back'
+                    user_menu(current_user)
+                else
+                    system "clear"
+                    Screen.title
+                    puts "Viewing Playlist #{selected}"
+                    filtered_songs = [] 
+                    playlist_songs = Playlist.all.select{|playlist| filtered_songs << playlist.songs unless playlist.songs == [] || playlist.public == false}
+                    selected_playlist = selected
+                    select_playlist_songs(current_playlists, filtered_songs[0], current_user, selected_playlist)
+                end
+        when 'Back'
+            user_menu(current_user)
     end
 end
 def get_recommendations (current_user)
