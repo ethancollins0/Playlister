@@ -25,4 +25,4 @@
                 - Play full song or sample songs from playlist 
                 (full song requires user to be logged into spotify)
 
-                ![](https://github.com/ethancollins0/Playlister/blob/master/lib/gif/rockin.gif)
+                ![Rockin](https://github.com/ethancollins0/Playlister/blob/master/lib/gif/rockin.gif)
