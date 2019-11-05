@@ -8,6 +8,10 @@
         
         
         
+        
+        
+![Selecting Song](https://github.com/ethancollins0/Playlister/blob/master/playlister.png)
+        
         Our project, Playlister, uses the spotify api to make queries and return songs, 
         and interact with playlists and songs in various ways. Using our CLI app, users 
         are able to:
@@ -24,4 +28,3 @@
                 - Get recommended songs based on specific songs from playlist
                 - Play full song or sample songs from playlist 
                 (full song requires user to be logged into spotify)
-![Rockin](https://github.com/ethancollins0/Playlister/blob/master/playlister.png)
