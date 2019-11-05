@@ -24,5 +24,4 @@
                 - Get recommended songs based on specific songs from playlist
                 - Play full song or sample songs from playlist 
                 (full song requires user to be logged into spotify)
-
-                ![Rockin](https://github.com/ethancollins0/Playlister/blob/master/playlister.png)
+![Rockin](https://github.com/ethancollins0/Playlister/blob/master/playlister.png)
